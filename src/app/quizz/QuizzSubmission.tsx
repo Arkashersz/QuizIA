@@ -11,18 +11,25 @@ type Props = {
 
 const QuizzSubmission = (props: Props) => {
   const { scorePercentage, score, totalQuestions } = props;
-    const {reward} = useReward('rewardId', 'confetti');
+  const { reward } = useReward('rewardId', 'confetti');
 
   useEffect(() => {
-    if(scorePercentage === 100) {
-        reward();
+    if (scorePercentage === 100) {
+      reward();
     }
-  }, [scorePercentage, reward])
+  }, [scorePercentage, reward]);
+
+  const pluralize = (count: number, singular: string, plural: string) => {
+    return count === 1 ? singular : plural;
+  };
+
+  const incorrect = totalQuestions - score;
+
   return (
     <div className="flex flex-col flex-1">
       <main className="py-11 flex flex-col gap-4 items-center flex-1 mt-24">
         <h2 className="text-3xl font-bold">Quiz Completo!</h2>
-        <p>Sua pontuação foi: {scorePercentage}</p>
+        <p>Sua pontuação foi: {scorePercentage}%</p>
         {scorePercentage === 100 ? (
           <div className="flex flex-col items-center">
             <p>Parabéns! 🎉</p>
@@ -39,18 +46,12 @@ const QuizzSubmission = (props: Props) => {
         ) : (
           <>
             <div className="flex flex-row gap-8 mt-6">
-              <Bar
-                percentage={scorePercentage}
-                color="green"
-              />
-              <Bar
-                percentage={100 - scorePercentage}
-                color="red"
-              />
+              <Bar percentage={scorePercentage} color="green" />
+              <Bar percentage={100 - scorePercentage} color="red" />
             </div>
             <div className="flex flex-row gap-8">
-              <p>{score} Acertos</p>
-              <p>{totalQuestions - score} Incorretas</p>
+              <p>{score} {pluralize(score, "Acerto", "Acertos")}</p>
+              <p>{incorrect} {pluralize(incorrect, "Incorreta", "Incorretas")}</p>
             </div>
           </>
         )}
