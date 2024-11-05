@@ -4,6 +4,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { JsonOutputFunctionsParser } from "langchain/output_parsers";
+import saveQuizz from "./saveToDb";
 
 export async function POST(req: NextRequest) {
   const body = await req.formData();
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     const model = new ChatOpenAI({
       openAIApiKey: process.env.OPENAI_API_KEY,
       modelName: "gpt-4-1106-preview",
-      openAIApiBaseUrl: "https://api.zukijourney.com/v1",
+      baseURL: "https://api.zukijourney.com/v1",
     });
 
     const parser = new JsonOutputFunctionsParser();
@@ -88,6 +89,8 @@ export async function POST(req: NextRequest) {
 
     const result = await runnable.invoke([message]);
     console.log(result);
+
+    const {quizzId} = await saveQuizz(result.quizz);
 
     return NextResponse.json(
       { message: "created successfully" },
